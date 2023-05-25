@@ -3,7 +3,8 @@ from glob import glob
 
 import numpy as np
 import pandas as pd
-from conf import CLASSES, DATA_PATH, INPUTS_PATH
+from conf import CLASSES, DATA_PATH, INPUTS_PATH, VAL_DATA, TRAIN_DATA
+
 rng = np.random.default_rng(1)
 # Get the minimum number of samples presented in all categories
 min_song_num = min([len(glob(os.path.join(INPUTS_PATH, 'wav', i, '**'))) for i in CLASSES])
@@ -43,5 +44,5 @@ for _class in CLASSES:
     train_df = pd.DataFrame(train_list_to_df, columns=['image', 'class'])
     val_df = pd.DataFrame(val_list_to_df, columns=['image', 'class'])
 
-    train_df.to_csv(os.path.join(INPUTS_PATH, 'train.csv'), mode='a', index=False)
-    val_df.to_csv(os.path.join(INPUTS_PATH, 'val.csv'), mode='a', index=False)
+    train_df.to_csv(TRAIN_DATA, mode='a', index=False)
+    val_df.to_csv(VAL_DATA, mode='a', index=False)

@@ -31,25 +31,41 @@ def hp_optimization():
     return best_model
 
 
-model = hp_optimization()
+def train_best_model(best_model):
+    """
+    The train_best_model function trains the best model found in the hyperparameter search.
+    It saves the trained model to disk and writes a history of training metrics to a csv file.
+    Finally, it evaluates performance on both samples and songs.
 
-train_ds = DataLoader(mode='train', sample_type=SAMPLE_TYPE).load_ds(batch_size=BATCH_SIZE)
-val_ds = DataLoader(mode='eval', sample_type=SAMPLE_TYPE).load_ds(batch_size=BATCH_SIZE)
+    :param best_model: Pass the model to be trained
+    :return: A history object
+    :doc-author: Trelent
+    """
+    if not os.path.exists(MODEL_DIR):
+        es_cb = tf.keras.callbacks.EarlyStopping(monitor=OBJECTIVE,
+                                                 start_from_epoch=5,
+                                                 patience=10,
+                                                 restore_best_weights=True)
+
+        history = best_model.fit(x=DataLoader(mode='train',
+                                              sample_type=SAMPLE_TYPE).load_ds(batch_size=BATCH_SIZE),
+                                 validation_data=DataLoader(mode='eval',
+                                                            sample_type=SAMPLE_TYPE).load_ds(batch_size=BATCH_SIZE),
+                                 callbacks=[es_cb],
+                                 epochs=EPOCHS,
+                                 verbose=1)
+
+        best_model.save(MODEL_DIR)
+        pd.DataFrame(history.history).to_csv(HISTORY)
+
+    # Run after saving model
+    evaluator = Evaluator()
+    evaluator.metrics_per_sample()
+    evaluator.metrics_per_song()
+    evaluator.results_to_csv()
 
 
-if not os.path.exists(MODEL_DIR):
-    es_cb = tf.keras.callbacks.EarlyStopping(monitor=OBJECTIVE,
-                                             start_from_epoch=5, patience=10,
-                                             restore_best_weights=True)
-
-    history = model.fit(x=train_ds, validation_data=val_ds, callbacks=[es_cb], epochs=EPOCHS, verbose=1)
-    model.save(MODEL_DIR)
-    pd.DataFrame(history.history).to_csv(HISTORY)
-
-# Run after saving model
-evaluator = Evaluator()
-evaluator.metrics_per_sample()
-evaluator.metrics_per_song()
-evaluator.results_to_csv()
+if __name__ == '__main__':
+    train_best_model(hp_optimization())
 
 exit()

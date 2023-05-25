@@ -15,7 +15,7 @@ os.makedirs(RESULTS, exist_ok=True)
 LOSS = 'categorical_crossentropy'
 METRICS = ['categorical_accuracy']
 OBJECTIVE = 'val_categorical_accuracy'
-EPOCHS = 5
+EPOCHS = 100
 BATCH_SIZE = 128
 INPUT_SHAPE = (128, 1251, 3)
 
