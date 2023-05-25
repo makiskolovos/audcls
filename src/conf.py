@@ -11,7 +11,7 @@ RESULTS = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME, 'results')
 MODEL_DIR = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME, 'model')
 HISTORY = os.path.join(RESULTS, 'history.csv')
 os.makedirs(RESULTS, exist_ok=True)
-TEST = 'test'
+
 LOSS = 'categorical_crossentropy'
 METRICS = ['categorical_accuracy']
 OBJECTIVE = 'val_categorical_accuracy'
