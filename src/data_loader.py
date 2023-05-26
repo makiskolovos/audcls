@@ -83,7 +83,7 @@ class DataLoader:
             ds_target = tf.data.Dataset.from_tensor_slices(np.asarray(df['class'].values).astype(np.int32))
             ds = tf.data.Dataset.zip((ds_image, ds_target))
             if self.mode == 'train':
-                ds = ds.shuffle(buffer_size=10 * batch_size)
+                ds = ds.shuffle(buffer_size=ds.cardinality())
             ds = ds.map(name='Load_Images', num_parallel_calls=tf.data.AUTOTUNE,
                         map_func=lambda img, cls: (
                             {'inputs': tf.py_function(self.load_image, inp=[img], Tout=tf.float32)},
