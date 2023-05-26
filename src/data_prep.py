@@ -6,16 +6,11 @@ import numpy as np
 
 import librosa
 import tensorflow as tf
-from conf import DATA_PATH, INPUTS_PATH
-
-SAMPLE_RATE = 16000
-FRAME_LENGTH = 1024
-FRAME_STEP = 128
-DURATION = 10
+from conf import DATA_PATH, INPUTS_PATH, FRAME_STEP, SAMPLE_RATE, N_MELS, DURATION, FRAME_LENGTH
 
 
 def load_and_prepare_audio(filename, sample_rate=SAMPLE_RATE, mono=True, frame_length=FRAME_LENGTH,
-                           frame_step=FRAME_STEP, n_mels=128, duration=DURATION):
+                           frame_step=FRAME_STEP, n_mels=N_MELS, duration=DURATION):
     """
     The load_and_prepare_audio function takes in a filename and returns a tuple of lists
     (spectrogram, chromagram, mfcc) of that audio file. The function first loads the audio

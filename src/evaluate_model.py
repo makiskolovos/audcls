@@ -2,15 +2,14 @@ import os
 
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from sklearn.metrics import classification_report, ConfusionMatrixDisplay
 
-from conf import CLASSES, MODEL_DIR, RESULTS, SAMPLE_TYPE
+from conf import CLASSES, RESULTS, SAMPLE_TYPE, BATCH_SIZE
 from data_loader import DataLoader
 
 
 class Evaluator:
-    def __init__(self):
+    def __init__(self, model):
         """
         It loads a model from disk (using tf.keras), and then uses that model to predict on a dataset.
 
@@ -20,11 +19,10 @@ class Evaluator:
         self.cols = ['image', '0', '1', '2', '3', 'predicted', 'target']
 
         self.dl = DataLoader(mode='predict', sample_type=SAMPLE_TYPE)
-        self.ds = self.dl.load_ds(batch_size=200)
+        self.ds = self.dl.load_ds(batch_size=BATCH_SIZE)
         self.df = self.dl.load_df()
 
-        self.model = tf.keras.models.load_model(MODEL_DIR, compile=True)
-        self.output = self.model.predict(self.ds)
+        self.output = model.predict(self.ds)
         self.predicted_class = np.argmax(self.output, axis=-1)  # Get predicted class
         self.targets = self.df['class']
 
