@@ -7,7 +7,8 @@ import pandas as pd
 from model import CustomHyperModel
 from evaluate_model import Evaluator
 from data_loader import DataLoader
-from conf import DIRECTORY, OBJECTIVE, PROJECT_NAME, MODEL_DIR, HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS
+from conf import DIRECTORY, OBJECTIVE, PROJECT_NAME, MODEL_DIR, HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS, \
+    PROJECT_DIR
 
 
 def hp_optimization():
@@ -28,7 +29,8 @@ def hp_optimization():
     [print(f"{name}: {best_hyperparameters.get(name)}") for name in best_hyperparameters.values]
 
     best_model = tuner.hypermodel.build(best_hyperparameters)
-
+    tf.keras.utils.plot_model(best_model, os.path.join(PROJECT_DIR, 'model.png'), show_shapes=True, show_dtype=True,
+                              show_trainable=True)
     return best_model
 
 

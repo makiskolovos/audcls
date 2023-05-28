@@ -14,13 +14,17 @@ N_MELS = 128
 NDFTS = round(((SAMPLE_RATE * DURATION) - 1) / (FRAME_LENGTH - (FRAME_LENGTH - FRAME_STEP))) + 1
 
 # Project parameters
-PROJECT_NAME = 'mfccs_only'
-SAMPLE_TYPE = 'mfccs'
+PROJECT_NAME = 'all'
 DIRECTORY = os.path.join(ROOT_PATH, 'output')
-RESULTS = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME, 'results')
-MODEL_DIR = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME, 'model')
-HISTORY = os.path.join(RESULTS, 'history.csv')
-os.makedirs(RESULTS, exist_ok=True)
+SAMPLE_TYPE = 'all'
+PROJECT_DIR = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME)
+
+RESULTS_DIR = os.path.join(PROJECT_DIR, 'results')
+MODEL_DIR = os.path.join(PROJECT_DIR, 'model')
+
+HISTORY = os.path.join(RESULTS_DIR, 'history.csv')
+os.makedirs(PROJECT_DIR, exist_ok=True)
+os.makedirs(RESULTS_DIR, exist_ok=True)
 
 # Training parameters
 LOSS = 'categorical_crossentropy'

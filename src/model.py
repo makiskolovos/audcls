@@ -20,12 +20,12 @@ class CustomHyperModel(kt.HyperModel):
         :return: A compiled keras model
         :doc-author: Trelent
         """
-        pretrained_models = {
-            'efficientnet_v2b3': efficientnet_v2.EfficientNetV2B3,
-            'efficientnet_b7': efficientnet.EfficientNetB7,
-            'inception_resnet_v2': inception_resnet_v2.InceptionResNetV2,
-            'inception_v3': inception_v3.InceptionV3
-        }
+        input1, input2, input3 = None, None, None
+        pretrained_models = {'efficientnet_v2b3': efficientnet_v2.EfficientNetV2B3,
+                             'efficientnet_b7': efficientnet.EfficientNetB7,
+                             'inception_resnet_v2': inception_resnet_v2.InceptionResNetV2,
+                             'inception_v3': inception_v3.InceptionV3
+                             }
 
         preprocess = {'efficientnet_v2b3': efficientnet_v2.preprocess_input,
                       'efficientnet_b7': efficientnet.preprocess_input,
@@ -33,23 +33,47 @@ class CustomHyperModel(kt.HyperModel):
                       'inception_v3': inception_v3.preprocess_input
                       }
 
-        pretrained_model_name = hp.Choice('pretrained_model', list(pretrained_models.keys()))  # efficientnet_v2b3
+        dense_nodes = hp.Int('dense_nodes', min_value=128, max_value=4096, step=2, sampling='log')
+        do_rate = hp.Float('dropout', min_value=0.0, max_value=0.7, step=0.01)
 
-        dense_1_nodes = hp.Int('dense_1_nodes', min_value=256, max_value=2048, step=2, sampling='log')
-        do_rate = hp.Float('dropout', min_value=0.0, max_value=0.5, step=0.01)
-        pretrained = pretrained_models[pretrained_model_name](include_top=False, input_shape=INPUT_SHAPE)
-        pretrained.trainable = False
-
-        image_input = keras.layers.Input(shape=INPUT_SHAPE, name='inputs')
-        preproc = tf.keras.layers.Lambda(preprocess[pretrained_model_name])(image_input)
-        pretrained = pretrained(preproc)
-
-        flatten = keras.layers.Flatten()(pretrained)
-        dense_1 = keras.layers.Dense(units=dense_1_nodes, activation="relu")(flatten)
-        dense_1 = keras.layers.BatchNormalization()(dense_1)
-        dropout = keras.layers.Dropout(rate=do_rate)(dense_1)
+        if SAMPLE_TYPE == 'all':
+            pretrained1 = pretrained_models['efficientnet_v2b3'](include_top=False, input_shape=INPUT_SHAPE)
+            pretrained2 = pretrained_models['efficientnet_v2b3'](include_top=False, input_shape=INPUT_SHAPE)
+            pretrained3 = pretrained_models['efficientnet_v2b3'](include_top=False, input_shape=INPUT_SHAPE)
+            pretrained1._name = 'spects_pre'
+            pretrained2._name = 'mfccs_pre'
+            pretrained3._name = 'chromas_pre'
+            pretrained1.trainable = False
+            pretrained2.trainable = False
+            pretrained3.trainable = False
+            input1 = keras.layers.Input(shape=INPUT_SHAPE, name='spects')
+            input2 = keras.layers.Input(shape=INPUT_SHAPE, name='mfccs')
+            input3 = keras.layers.Input(shape=INPUT_SHAPE, name='chromas')
+            preproc1 = tf.keras.layers.Lambda(preprocess['efficientnet_v2b3'], name='preproc_spects')(input1)
+            preproc2 = tf.keras.layers.Lambda(preprocess['efficientnet_v2b3'], name='preproc_mfccs')(input2)
+            preproc3 = tf.keras.layers.Lambda(preprocess['efficientnet_v2b3'], name='preproc_chromas')(input3)
+            pre_out1 = pretrained1(preproc1)
+            pre_out2 = pretrained2(preproc2)
+            pre_out3 = pretrained3(preproc3)
+            pre_out = keras.layers.Average()([pre_out1, pre_out2, pre_out3])
+        else:
+            pretrained_model_name = hp.Choice('pretrained_model', list(pretrained_models.keys()))
+            pretrained = pretrained_models[pretrained_model_name](include_top=False, input_shape=INPUT_SHAPE)
+            pretrained.trainable = False
+            input1 = keras.layers.Input(shape=INPUT_SHAPE, name='inputs')
+            preproc1 = tf.keras.layers.Lambda(preprocess[pretrained_model_name])(input1)
+            pre_out = pretrained(preproc1)
+        flatten = keras.layers.Flatten()(pre_out)
+        dense = keras.layers.Dense(units=dense_nodes, activation='relu')(flatten)
+        dense = keras.layers.BatchNormalization()(dense)
+        dropout = keras.layers.Dropout(rate=do_rate)(dense)
         output = keras.layers.Dense(len(CLASSES), activation='softmax', name='class')(dropout)
-        model = keras.models.Model(image_input, output)
+
+        if SAMPLE_TYPE == 'all':
+            model = keras.models.Model([input1, input2, input3], output)
+        else:
+            model = keras.models.Model(input1, output)
+
         opt = tf.keras.optimizers.Adam(learning_rate=1e-5)
         model.compile(optimizer=opt, loss=LOSS, metrics=METRICS)
         return model
