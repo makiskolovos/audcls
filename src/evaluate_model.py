@@ -57,7 +57,6 @@ class Evaluator:
 
         results_dict['y_true'] = self.df['class']
         results_dict['y_pred'] = self.y_pred
-
         self.results_df = pd.DataFrame(results_dict)
         self.results_df = self.results_df[self.cols]
 

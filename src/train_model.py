@@ -7,7 +7,7 @@ import pandas as pd
 from model import CustomHyperModel
 from evaluate_model import Evaluator
 from data_loader import DataLoader
-from conf import DIRECTORY, OBJECTIVE, PROJECT_NAME, MODEL_DIR, HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS, \
+from conf import OUTPUTS_PATH, OBJECTIVE, PROJECT_NAME, MODEL_DIR, HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS, \
     PROJECT_DIR
 
 
@@ -21,7 +21,7 @@ def hp_optimization():
     :return: The best model
     :doc-author: Trelent
     """
-    tuner = kt.BayesianOptimization(objective=OBJECTIVE, directory=DIRECTORY, project_name=PROJECT_NAME,
+    tuner = kt.BayesianOptimization(objective=OBJECTIVE, directory=OUTPUTS_PATH, project_name=PROJECT_NAME,
                                     hypermodel=CustomHyperModel(), max_trials=MAX_TRIALS, overwrite=False, seed=None)
 
     tuner.search()
@@ -56,7 +56,10 @@ def train_model(model):
 
         pd.DataFrame(model.history.history).to_csv(HISTORY, index=False)
         model.save(MODEL_DIR)
-        return model
+    else:
+        model = tf.keras.models.load_model(MODEL_DIR)
+
+    return model
 
 
 def evaluate_model(trained_model):

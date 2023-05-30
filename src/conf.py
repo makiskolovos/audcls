@@ -3,6 +3,8 @@ import os
 # Main paths
 ROOT_PATH = os.path.dirname(__file__).replace('src', '')
 INPUTS_PATH = os.path.join(ROOT_PATH, 'inputs')
+OUTPUTS_PATH = os.path.join(ROOT_PATH, 'output')
+
 DATA_PATH = os.path.join(INPUTS_PATH, 'data')
 
 # Raw data parameters
@@ -15,9 +17,8 @@ NDFTS = round(((SAMPLE_RATE * DURATION) - 1) / (FRAME_LENGTH - (FRAME_LENGTH - F
 
 # Project parameters
 PROJECT_NAME = 'all'
-DIRECTORY = os.path.join(ROOT_PATH, 'output')
 SAMPLE_TYPE = 'all'
-PROJECT_DIR = os.path.join(ROOT_PATH, DIRECTORY, PROJECT_NAME)
+PROJECT_DIR = os.path.join(OUTPUTS_PATH, PROJECT_NAME)
 
 RESULTS_DIR = os.path.join(PROJECT_DIR, 'results')
 MODEL_DIR = os.path.join(PROJECT_DIR, 'model')
