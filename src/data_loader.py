@@ -111,9 +111,12 @@ class DataLoader:
             if self.sample_type == 'all':
                 ds = ds_image.map(name='Load_Images',
                                   map_func=lambda img:
-                                  (tf.py_function(self.load_image, inp=[img], Tout=[tf.float32, tf.float32, tf.float32])),
+                                  (tf.py_function(self.load_image, inp=[img],
+                                                  Tout=[tf.float32, tf.float32, tf.float32])),
                                   num_parallel_calls=tf.data.AUTOTUNE)
-                ds = ds.map(map_func=lambda spects, mfccs, chromas: {'spects': spects, 'mfccs': mfccs, 'chromas': chromas},
+                ds = ds.map(map_func=lambda spects, mfccs, chromas: {'spects': spects,
+                                                                     'mfccs': mfccs,
+                                                                     'chromas': chromas},
                             num_parallel_calls=tf.data.AUTOTUNE)
             else:
                 ds = ds_image.map(name='Load_Images',

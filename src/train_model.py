@@ -7,8 +7,8 @@ import pandas as pd
 from model import CustomHyperModel
 from evaluate_model import Evaluator
 from data_loader import DataLoader
-from conf import OUTPUTS_PATH, OBJECTIVE, PROJECT_NAME, MODEL_DIR, HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS, \
-    PROJECT_DIR
+from conf import OUTPUTS_PATH, OBJECTIVE, PROJECT_NAME, MODEL_DIR,\
+    HISTORY, SAMPLE_TYPE, EPOCHS, BATCH_SIZE, MAX_TRIALS, PROJECT_DIR
 
 
 def hp_optimization():
